@@ -3,11 +3,14 @@ import {
   Controller,
   HttpCode,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
+  Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import CreateUserDto from './dto/create-user.dto';
+import { LocalGuard } from './local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -18,5 +21,12 @@ export class AuthController {
   @UsePipes(new ValidationPipe({ transform: true }))
   async signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signup(createUserDto);
+  }
+
+  @Post('/login')
+  @HttpCode(200)
+  @UseGuards(LocalGuard)
+  async login(@Request() req) {
+    return req.user;
   }
 }

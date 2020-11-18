@@ -5,6 +5,7 @@ import {
   BaseEntity,
   OneToOne,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { Sitter } from '../sitter/sitter.entity';
 
@@ -14,6 +15,7 @@ enum memberType {
 }
 
 @Entity()
+@Unique(['user_id'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
