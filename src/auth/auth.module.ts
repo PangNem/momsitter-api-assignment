@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserRepository } from 'src/user/user.repository';
 import { SitterRepository } from 'src/sitter/sitter.repository';
 import { UserService } from 'src/user/user.service';
 import { LocalStrategy } from './local.strategy';
@@ -10,6 +9,8 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import { jwtConstants } from './auth.constants';
 import { JwtStrategy } from './jwt.strategy';
+import { UserRepository } from 'src/user/user.repository';
+import { SitterService } from 'src/sitter/sitter.service';
 
 @Module({
   controllers: [AuthController],

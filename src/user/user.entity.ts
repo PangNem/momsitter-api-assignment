@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Sitter } from '../sitter/sitter.entity';
 
-enum memberType {
+export enum memberType {
   SITTER = 'SITTER',
   PARENT = 'PARENT',
 }

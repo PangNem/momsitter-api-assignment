@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sitter } from 'src/sitter/sitter.entity';
 import { SitterRepository } from 'src/sitter/sitter.repository';
+import { SitterService } from 'src/sitter/sitter.service';
 import { User } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
 import { UserService } from 'src/user/user.service';
@@ -15,7 +16,6 @@ export class AuthService {
     @InjectRepository(User) private userRepository: UserRepository,
     @InjectRepository(Sitter) private sitterRepository: SitterRepository,
 
-    private userSerivce: UserService,
     private jwtService: JwtService,
   ) {}
 
@@ -25,7 +25,7 @@ export class AuthService {
     if (this.isSitterMember(member_type)) {
       const { careable_baby_age, self_introduction, ...result } = createUserDto;
 
-      const sitterUserData = await this.sitterRepository.createSitterUser({
+      const sitterUserData = await this.sitterRepository.createUser({
         careable_baby_age,
         self_introduction,
       });
@@ -39,16 +39,19 @@ export class AuthService {
   }
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userSerivce.findOne(username);
+    const user = await this.userRepository.findOne(username);
+
     if (user && user.password === password) {
       const { password, ...result } = user;
       return result;
     }
+    console.log(user && user.password === password);
     return null;
   }
 
   async login(user: any) {
     const payload = { username: user.username, sub: user.id };
+    console.log(payload);
     return {
       access_token: this.jwtService.sign(payload),
     };

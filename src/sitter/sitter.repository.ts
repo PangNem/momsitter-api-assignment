@@ -3,8 +3,8 @@ import { Sitter } from './sitter.entity';
 
 @EntityRepository(Sitter)
 export class SitterRepository extends Repository<Sitter> {
-  async createSitterUser({ careable_baby_age, self_introduction }) {
-    return Sitter.create({
+  async createUser({ careable_baby_age, self_introduction }) {
+    return await Sitter.create({
       careable_baby_age,
       self_introduction,
     }).save();

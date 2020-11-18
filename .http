@@ -12,9 +12,9 @@ content-type: application/json
 
   "gender": "여",
 
-  "username": "wonderfulPark0206",
+  "username": "gugu",
 
-  "password": "parak0206%^",
+  "password": "asdf",
 
   "email": "wonderfulPark0206@gmail.com",
 
@@ -30,10 +30,10 @@ POST /auth/login HTTP/1.1
 Host: localhost:3000
 Content-Type: application/json
 
-{"username": "wonderfulPark0206", "password": "parak0206%^"}
+{"username": "gugu", "password": "asdf"}
 
 ###
-GET /auth/profile HTTP/1.1
+GET /user/profile HTTP/1.1
 Host: localhost:3000
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndvbmRlcmZ1bFBhcmswMjA2Iiwic3ViIjoxLCJpYXQiOjE2MDU3MjE5ODMsImV4cCI6MTYwNTcyMzc4M30.g4I7kX7JOlDquaLCPh5K1dwxKItkUS4iooqRiBFZCgQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imd1Z3UiLCJzdWIiOjEwLCJpYXQiOjE2MDU3Mzc1NzYsImV4cCI6MTYwNTczNzg3Nn0.uBShPxwGpvt38_6lblzWXz4ylqXUbi2xVF-ouhOcUZE
