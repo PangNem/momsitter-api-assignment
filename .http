@@ -6,8 +6,6 @@ POST http://localhost:3000/auth/signup HTTP/1.1
 content-type: application/json
 
 {
-  "id": 5321,
-
   "name": "박시터",
 
   "birth": 19980206,
