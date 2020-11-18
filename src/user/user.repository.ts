@@ -6,7 +6,7 @@ export class UserRepository extends Repository<User> {
   async createUser(result: object) {
     return User.create(result).save();
   }
-  async findOne(user_id) {
-    return User.findOne({ user_id });
+  async findOne(username) {
+    return User.findOne({ username });
   }
 }

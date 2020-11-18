@@ -16,7 +16,7 @@ export default class CreateUserDto {
   gender: string;
 
   @IsNotEmpty()
-  user_id: string;
+  username: string;
 
   @IsNotEmpty()
   password: string;

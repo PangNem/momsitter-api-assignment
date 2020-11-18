@@ -15,7 +15,7 @@ enum memberType {
 }
 
 @Entity()
-@Unique(['user_id'])
+@Unique(['username'])
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -30,7 +30,7 @@ export class User extends BaseEntity {
   gender: string;
 
   @Column()
-  user_id: string;
+  username: string;
 
   @Column()
   password: string;

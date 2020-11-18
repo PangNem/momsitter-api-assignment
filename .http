@@ -12,7 +12,7 @@ content-type: application/json
 
   "gender": "여",
 
-  "user_id": "wonderfulPark0206",
+  "username": "wonderfulPark0206",
 
   "password": "parak0206%^",
 
@@ -29,4 +29,4 @@ content-type: application/json
 POST http://localhost:3000/auth/login HTTP/1.1
 Content-Type: application/json
 
-{"user_id": "wonderfulPark0206", "password": "parak0206%^"}
+{"username": "wonderfulPark0206", "password": "parak0206%^"}
