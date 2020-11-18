@@ -1,4 +1,7 @@
 import { Module } from '@nestjs/common';
+import { SitterModule } from '../sitter/sitter.module';
 
-@Module({})
+@Module({
+  imports: [SitterModule],
+})
 export class UserModule {}

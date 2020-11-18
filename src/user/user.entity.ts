@@ -1,4 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  BaseEntity,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
+import { Sitter } from '../sitter/sitter.entity';
 
 enum memberType {
   SITTER = 'SITTER',
@@ -30,4 +38,8 @@ export class User extends BaseEntity {
 
   @Column()
   member_type: memberType;
+
+  @OneToOne(() => Sitter)
+  @JoinColumn({ name: 'sitter_id' })
+  sitter: Sitter;
 }
