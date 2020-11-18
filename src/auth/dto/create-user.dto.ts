@@ -30,7 +30,7 @@ export default class CreateUserDto {
 
   @IsNotEmpty()
   @IsEnum(memberType)
-  member_type: string;
+  member_type: memberType;
 
   @IsOptional()
   careable_baby_age: number;
