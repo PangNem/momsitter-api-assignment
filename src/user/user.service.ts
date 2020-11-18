@@ -7,6 +7,6 @@ import { UserRepository } from './user.repository';
 export class UserService {
   constructor(@InjectRepository(User) private userRepository: UserRepository) {}
   async findOne(username) {
-    return await this.userRepository.findOne(username);
+    return this.userRepository.findOne(username);
   }
 }

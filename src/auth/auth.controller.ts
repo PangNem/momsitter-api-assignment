@@ -16,16 +16,16 @@ import { LocalAuthGuard } from './local-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('/signup')
-  @HttpCode(201)
   @UsePipes(new ValidationPipe({ transform: true }))
+  @HttpCode(201)
+  @Post('/signup')
   async signup(@Body() createUserDto: CreateUserDto) {
     return this.authService.signup(createUserDto);
   }
 
-  @Post('/login')
-  @HttpCode(200)
   @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
+  @Post('/login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
