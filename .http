@@ -1,0 +1,28 @@
+### 
+GET http://localhost:3000/ HTTP/1.1
+
+### 
+POST http://localhost:3000/auth/signup HTTP/1.1
+content-type: application/json
+
+{
+  "id": 5321,
+
+  "name": "박시터",
+
+  "birth": 19980206,
+
+  "gender": "여",
+
+  "user_id": "wonderfulPark0206",
+
+  "password": "parak0206%^",
+
+  "email": "wonderfulPark0206@gmail.com",
+
+  "member_type": "SITTER",
+
+  "careable_baby_age": 2,
+
+  "self_introduction": "유아교육과를 전공중인 대학생 시터입니다! 사촌 동생들을 많이 돌본 경험이 있어서 아이랑 잘 놀아줄 수 있어요."
+}
