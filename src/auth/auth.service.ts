@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Sitter } from 'src/sitter/sitter.entity';
 import { SitterRepository } from 'src/sitter/sitter.repository';
@@ -15,6 +16,7 @@ export class AuthService {
     @InjectRepository(Sitter) private sitterRepository: SitterRepository,
 
     private userSerivce: UserService,
+    private jwtService: JwtService,
   ) {}
 
   async signup(createUserDto: CreateUserDto) {
@@ -43,6 +45,13 @@ export class AuthService {
       return result;
     }
     return null;
+  }
+
+  async login(user: any) {
+    const payload = { username: user.username, sub: user.id };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
   }
 
   private isSitterMember(member_type: string): boolean {
