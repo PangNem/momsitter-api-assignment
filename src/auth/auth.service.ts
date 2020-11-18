@@ -1,29 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/user.entity';
-import { Repository } from 'typeorm';
+import { UserRepository } from 'src/user/user.repository';
 import CreateUserDto from './dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  constructor(@InjectRepository(User) private userRepository: UserRepository) {}
 
   async signup(createUserDto: CreateUserDto) {
     const { member_type } = createUserDto;
 
     if (this.isSitterMember(member_type)) {
-      const user = new User();
       const { careable_baby_age, self_introduction, ...result } = createUserDto;
-
-      Object.assign(user, result);
-      await user.save();
-      return user;
+      const userData = await this.userRepository.createUser(result);
+      return {
+        userData,
+      };
     }
   }
 
-  private isSitterMember(type) {
-    return type === 'SITTER';
+  private isSitterMember(member_type: string): boolean {
+    return member_type === 'SITTER';
   }
 }

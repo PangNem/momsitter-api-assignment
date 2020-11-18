@@ -6,7 +6,6 @@ enum memberType {
 }
 
 export default class CreateUserDto {
-  @IsNotEmpty()
   id: number;
 
   @IsNotEmpty()
