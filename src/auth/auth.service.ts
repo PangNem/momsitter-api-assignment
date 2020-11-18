@@ -23,12 +23,12 @@ export class AuthService {
         careable_baby_age,
         self_introduction,
       });
-      const userData = await this.userRepository.createUser(result);
+      const userData = await this.userRepository.createUser({
+        ...result,
+        sitter: sitterUserData.id,
+      });
 
-      return {
-        userData,
-        sitterUserData,
-      };
+      return Object.assign(sitterUserData, userData);
     }
   }
 

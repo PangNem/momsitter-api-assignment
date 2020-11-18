@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Sitter } from './sitter.entity';
 
-@EntityRepository()
+@EntityRepository(Sitter)
 export class SitterRepository extends Repository<Sitter> {
   async createSitterUser({ careable_baby_age, self_introduction }) {
     return Sitter.create({
