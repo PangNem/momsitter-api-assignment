@@ -1,3 +1,5 @@
+import { IsEnum } from 'class-validator';
+import { Parent } from 'src/parent/parent.entity';
 import {
   Entity,
   Column,
@@ -8,11 +10,7 @@ import {
   Unique,
 } from 'typeorm';
 import { Sitter } from '../sitter/sitter.entity';
-
-export enum memberType {
-  SITTER = 'SITTER',
-  PARENT = 'PARENT',
-}
+import { MemberType } from './user.enum';
 
 @Entity()
 @Unique(['username'])
@@ -39,9 +37,14 @@ export class User extends BaseEntity {
   email: string;
 
   @Column()
-  member_type: memberType;
+  @IsEnum(MemberType)
+  member_type: MemberType;
 
   @OneToOne(() => Sitter)
   @JoinColumn({ name: 'sitter_id' })
   sitter: Sitter;
+
+  @OneToOne(() => Parent)
+  @JoinColumn({ name: 'parent_id' })
+  parent: Parent;
 }

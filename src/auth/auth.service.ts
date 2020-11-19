@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Parent } from 'src/parent/parent.entity';
+import { ParentRepository } from 'src/parent/parent.repository';
 import { Sitter } from 'src/sitter/sitter.entity';
 import { SitterRepository } from 'src/sitter/sitter.repository';
 import { SitterService } from 'src/sitter/sitter.service';
@@ -15,6 +17,7 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: UserRepository,
     @InjectRepository(Sitter) private sitterRepository: SitterRepository,
+    @InjectRepository(Parent) private parentRepository: ParentRepository,
 
     private jwtService: JwtService,
   ) {}
@@ -25,16 +28,26 @@ export class AuthService {
     if (this.isSitterMember(member_type)) {
       const { careable_baby_age, self_introduction, ...result } = createUserDto;
 
-      const sitterUserData = await this.sitterRepository.createUser({
+      const sitter = await this.sitterRepository.createUser({
         careable_baby_age,
         self_introduction,
       });
-      const userData = await this.userRepository.createUser({
+      await this.userRepository.createUser({
         ...result,
-        sitter: sitterUserData.id,
+        sitter: sitter.id,
       });
+    }
+    if (this.isParentMember(member_type)) {
+      const { desired_baby_age, request_infomation, ...result } = createUserDto;
 
-      return Object.assign(sitterUserData, userData);
+      const parent = await this.parentRepository.createUser({
+        desired_baby_age,
+        request_infomation,
+      });
+      await this.userRepository.createUser({
+        ...result,
+        parent: parent.id,
+      });
     }
   }
 
@@ -45,7 +58,6 @@ export class AuthService {
       const { password, ...result } = user;
       return result;
     }
-    console.log(user && user.password === password);
     return null;
   }
 
@@ -59,5 +71,8 @@ export class AuthService {
 
   private isSitterMember(member_type: string): boolean {
     return member_type === 'SITTER';
+  }
+  private isParentMember(member_type: string): boolean {
+    return member_type === 'PARENT';
   }
 }

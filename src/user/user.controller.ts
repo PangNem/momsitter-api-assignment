@@ -5,6 +5,7 @@ import {
   Request,
   Patch,
   Body,
+  Post,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -26,5 +27,11 @@ export class UserController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     return this.userService.updateProfile(request.user, updateProfileDto);
+  }
+
+  @Post('additional-register')
+  @UseGuards(JwtAuthGuard)
+  async additionalRegister(@Request() request, @Body() data) {
+    return this.userService.additionalRegister(request.user, data);
   }
 }

@@ -10,7 +10,7 @@ import { JwtModule } from '@nestjs/jwt/dist/jwt.module';
 import { jwtConstants } from './auth.constants';
 import { JwtStrategy } from './jwt.strategy';
 import { UserRepository } from 'src/user/user.repository';
-import { SitterService } from 'src/sitter/sitter.service';
+import { ParentRepository } from 'src/parent/parent.repository';
 
 @Module({
   controllers: [AuthController],
@@ -19,14 +19,15 @@ import { SitterService } from 'src/sitter/sitter.service';
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '300s' },
+      signOptions: { expiresIn: '300000s' },
     }),
   ],
   providers: [
     AuthService,
+    UserService,
     UserRepository,
     SitterRepository,
-    UserService,
+    ParentRepository,
     LocalStrategy,
     JwtStrategy,
   ],

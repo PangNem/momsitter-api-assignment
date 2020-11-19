@@ -1,18 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SitterService } from 'src/sitter/sitter.service';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
-import { memberType } from './user.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { SitterRepository } from 'src/sitter/sitter.repository';
 import { Sitter } from 'src/sitter/sitter.entity';
+import { MemberType } from './user.enum';
+import { Parent } from 'src/parent/parent.entity';
+import { ParentRepository } from 'src/parent/parent.repository';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: UserRepository,
     @InjectRepository(Sitter) private sitterRepository: SitterRepository,
+    @InjectRepository(Parent) private parentRepository: ParentRepository,
   ) {}
   async createUser(user) {
     return this.userRepository.create(user);
@@ -25,9 +27,15 @@ export class UserService {
 
   async getUserProfile(user) {
     let profile;
+
     if (this.isSitterMember(user.member_type)) {
-      profile = await this.userRepository.findSitter(user.sitter_id);
+      profile = await this.userRepository.findSitter(user.id);
+    } else if (this.isParentMember(user.member_type)) {
+      profile = await this.userRepository.findParent(user.id);
+    } else {
+      profile = await this.userRepository.findAll(user.id);
     }
+    console.log(profile);
     return profile;
   }
 
@@ -43,17 +51,48 @@ export class UserService {
     const userData = this.filterObject(userColumns, updateProfileDto);
     await this.userRepository.updateProfile(user.id, userData);
 
+    const sitterColumns = ['careable_baby_age', 'self_introduction'];
+    const sitterData = this.filterObject(sitterColumns, updateProfileDto);
     if (this.isSitterMember(user.member_type)) {
-      const sitterColumns = ['careable_baby_age', 'self_introduction'];
-      const sitterData = this.filterObject(sitterColumns, updateProfileDto);
-
       await this.sitterRepository.updateProfile(user.sitter_id, sitterData);
+      return this.userRepository.findSitter(user.id);
     }
 
-    return this.getUserProfile(user);
+    const parentColumns = ['desired_baby_age', 'request_infomation'];
+    const parentData = this.filterObject(parentColumns, updateProfileDto);
+    if (this.isSitterMember(user.member_type)) {
+      await this.parentRepository.updateProfile(user.parent_id, parentData);
+      return this.userRepository.findParent(user.id);
+    }
   }
+
+  async additionalRegister(user, data) {
+    if (user.member_type === MemberType.ALL) {
+      throw new BadRequestException();
+    }
+
+    if (this.isSitterMember(user.member_type)) {
+      const parent = await this.parentRepository.createUser(data);
+      await this.userRepository.updateProfile(user.id, {
+        parent: parent.id,
+        member_type: MemberType.ALL,
+      });
+    }
+    if (this.isParentMember(user.member_type)) {
+      const sitter = await this.sitterRepository.createUser(data);
+      await this.userRepository.updateProfile(user.id, {
+        sitter: sitter.id,
+        member_type: MemberType.ALL,
+      });
+    }
+  }
+
   private isSitterMember(member_type) {
-    return member_type === memberType.SITTER;
+    return member_type === MemberType.SITTER;
+  }
+
+  private isParentMember(member_type) {
+    return member_type === MemberType.PARENT;
   }
 
   private filterObject(keys, from) {

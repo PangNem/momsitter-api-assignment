@@ -15,8 +15,18 @@ export class UserRepository extends Repository<User> {
     const query = `SELECT * FROM USER WHERE USERNAME = "${username}"`;
     return User.query(query);
   }
-  async findSitter(sitter_id) {
-    const query = `SELECT user.*, sitter.* from user LEFT JOIN sitter ON "${sitter_id}" = sitter.id where user.sitter_id = "${sitter_id}"`;
+  async findSitter(id) {
+    const query = `SELECT user.*, sitter.careable_baby_age, sitter.self_introduction from user LEFT JOIN sitter ON user.sitter_id = sitter.id where user.id = "${id}"`;
+    return User.query(query);
+  }
+
+  async findParent(id) {
+    const query = `SELECT user.*, parent.desired_baby_age, parent.request_infomation from user LEFT JOIN parent ON user.sitter_id = parent.id where user.id = "${id}"`;
+    return User.query(query);
+  }
+
+  async findAll(id) {
+    const query = `SELECT * from (select user.*, sitter.careable_baby_age, sitter.self_introduction from user left join sitter on user.sitter_id = sitter.id) as a left join parent on a.parent_id = parent.id where a.id = "${id}";`;
     return User.query(query);
   }
 
