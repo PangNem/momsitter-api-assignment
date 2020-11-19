@@ -19,4 +19,12 @@ export class UserRepository extends Repository<User> {
     const query = `SELECT user.*, sitter.* from user LEFT JOIN sitter ON "${sitter_id}" = sitter.id where user.sitter_id = "${sitter_id}"`;
     return User.query(query);
   }
+
+  async updateProfile(id, data) {
+    return User.createQueryBuilder('user')
+      .update(User)
+      .set(data)
+      .where('id = :id', { id })
+      .execute();
+  }
 }
