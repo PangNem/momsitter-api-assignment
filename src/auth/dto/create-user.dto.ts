@@ -1,9 +1,11 @@
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-
-enum memberType {
-  SITTER = 'SITTER',
-  PARENT = 'PARENT',
-}
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+} from 'class-validator';
+import { AllowedCreateMemberType } from 'src/user/user.enum';
 
 export default class CreateUserDto {
   @IsNotEmpty()
@@ -19,6 +21,7 @@ export default class CreateUserDto {
   username: string;
 
   @IsNotEmpty()
+  @Matches(/^[A-Za-z0-9]{6,12}$/)
   password: string;
 
   @IsNotEmpty()
@@ -26,8 +29,8 @@ export default class CreateUserDto {
   email: string;
 
   @IsNotEmpty()
-  @IsEnum(memberType)
-  member_type: memberType;
+  @IsEnum(AllowedCreateMemberType)
+  member_type: AllowedCreateMemberType;
 
   @IsOptional()
   careable_baby_age: number;

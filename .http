@@ -12,28 +12,48 @@ content-type: application/json
 
   "gender": "여",
 
-  "username": "wonderfulPark0206",
+  "username": "sitter1234",
 
-  "password": "parak0206%^",
+  "password": "A123456789",
 
   "email": "wonderfulPark0206@gmail.com",
 
-  "member_type": "SITTER",
+  "member_type": "PARENT",
 
-  "careable_baby_age": 2,
-
-  "self_introduction": "유아교육과를 전공"
+  "desired_baby_age":5,
+  "request_infomation": "잘 부탁 드립니다."
+   
 }
+
 
 ###
 POST /auth/login HTTP/1.1
 Host: localhost:3000
 Content-Type: application/json
 
-{"username": "wonderfulPark0206", "password": "parak0206%^"}
+{"username": "sitter1234", "password": "A123456789"}
 
 ###
-GET /auth/profile HTTP/1.1
+GET /user/profile HTTP/1.1
 Host: localhost:3000
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IndvbmRlcmZ1bFBhcmswMjA2Iiwic3ViIjoxLCJpYXQiOjE2MDU3MjE5ODMsImV4cCI6MTYwNTcyMzc4M30.g4I7kX7JOlDquaLCPh5K1dwxKItkUS4iooqRiBFZCgQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNpdHRlcjEyMzQiLCJzdWIiOjYsImlhdCI6MTYwNTc1Nzg3MiwiZXhwIjoxNjA2MDU3ODcyfQ.1s6D7JMJu5TSfXFs43L5xiWqbgEED_wHCPrffGgy5n8
+
+###
+PATCH /user/profile HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNpdHRlcjEyMzQiLCJzdWIiOjYsImlhdCI6MTYwNTc1Nzg3MiwiZXhwIjoxNjA2MDU3ODcyfQ.1s6D7JMJu5TSfXFs43L5xiWqbgEED_wHCPrffGgy5n8
+
+{"name": "profile 업데이트2", "birth":20010720, "request_information": "request","careable_baby_age":1, "self_introduction": "update profile"}
+
+###
+POST /user/additional-register HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InBhcmVudDE5Iiwic3ViIjo1LCJpYXQiOjE2MDU3NTY5NTAsImV4cCI6MTYwNjA1Njk1MH0.c6FhHuFDZE2xTIBNfwRE4uHiiMbPdaHvFGq6UJ1ZMqY
+
+# {"careable_baby_age":1, "self_introduction": "update profile"}
+
+{"desired_baby_age":5, "request_infomation": "잘 부탁 드립니다."}
+
