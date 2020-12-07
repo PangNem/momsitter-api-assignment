@@ -33,14 +33,14 @@ export default class CreateUserDto {
   member_type: AllowedCreateMemberType;
 
   @IsOptional()
-  careable_baby_age: number;
+  careable_baby_age?: number;
 
   @IsOptional()
-  self_introduction: string;
+  self_introduction?: string;
 
   @IsOptional()
-  desired_baby_age: number;
+  desired_baby_age?: number;
 
   @IsOptional()
-  request_infomation: string;
+  request_infomation?: string;
 }
