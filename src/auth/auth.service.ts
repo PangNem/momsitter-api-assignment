@@ -5,10 +5,8 @@ import { Parent } from 'src/parent/parent.entity';
 import { ParentRepository } from 'src/parent/parent.repository';
 import { Sitter } from 'src/sitter/sitter.entity';
 import { SitterRepository } from 'src/sitter/sitter.repository';
-import { SitterService } from 'src/sitter/sitter.service';
 import { User } from 'src/user/user.entity';
 import { UserRepository } from 'src/user/user.repository';
-import { UserService } from 'src/user/user.service';
 
 import CreateUserDto from './dto/create-user.dto';
 

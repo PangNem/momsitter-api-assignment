@@ -1,52 +1,42 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ParentRepository } from 'src/parent/parent.repository';
+import { Test } from '@nestjs/testing';
 import { AllowedCreateMemberType } from 'src/user/user.enum';
-import { UserRepository } from 'src/user/user.repository';
+import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
-const mockRepositoy = {
-  createUser: jest.fn(),
-};
-
 describe('AuthService', () => {
-  let service: AuthService;
-  let userRepository: UserRepository;
-  let parentRepository: ParentRepository;
+  let authService;
+  let authController;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AuthService,
-        { provide: userRepository, useFactory: mockRepositoy },
-        { provide: parentRepository, useFactory: mockRepositoy },
-      ],
+    const moduleRef = await Test.createTestingModule({
+      controllers: [AuthController],
+      providers: [AuthService],
     }).compile();
 
-    service = module.get<AuthService>(AuthService);
-
-    userRepository = module.get<UserRepository>(UserRepository);
-    parentRepository = module.get<ParentRepository>(ParentRepository);
+    authService = moduleRef.get<AuthService>(AuthService);
+    authController = moduleRef.get<AuthController>(AuthController);
   });
 
   afterAll(async () => {});
 
-  const signupTestData = {
-    name: '박시터',
-    birth: 19980206,
-    gender: '여',
-    username: 'sitter1234',
-    password: 'A123456789',
-    email: 'wonderfulPark0206@gmail.com',
-    member_type: AllowedCreateMemberType.PARENT,
-    desired_baby_age: 5,
-    request_infomation: '잘 부탁 드립니다.',
-  };
-
   describe('auth signup', () => {
     it('create parent user', async () => {
-      expect(parentRepository.createUser).not.toHaveBeenCalled();
-      await service.signup(signupTestData);
-      expect(parentRepository.createUser).toHaveBeenCalled();
+      const signupTestData = {
+        name: '박시터',
+        birth: 19980206,
+        gender: '여',
+        username: 'sitter1234',
+        password: 'A123456789',
+        email: 'wonderfulPark0206@gmail.com',
+        member_type: AllowedCreateMemberType.PARENT,
+        desired_baby_age: 5,
+        request_infomation: '잘 부탁 드립니다.',
+      };
+      jest
+        .spyOn(authService, 'auth signup')
+        .mockImplementation(() => signupTestData);
+
+      expect(await authController.signup()).toBe(signupTestData);
     });
   });
 });
