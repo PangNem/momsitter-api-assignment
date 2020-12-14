@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { Parent } from 'src/parent/parent.entity';
+import { Parent } from '../parent/parent.entity';
 import {
   Entity,
   Column,

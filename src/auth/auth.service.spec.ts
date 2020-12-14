@@ -1,20 +1,37 @@
+import { forwardRef } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
-import { AllowedCreateMemberType } from 'src/user/user.enum';
+import { ParentRepository } from '../parent/parent.repository';
+import { AllowedCreateMemberType } from '../user/user.enum';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+
+const mockRepository = () => ({
+  createUser: jest.fn(),
+});
 
 describe('AuthService', () => {
   let authService;
   let authController;
 
+  let userRepository;
+  let parentRepository;
+
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [AuthService],
+      providers: [
+        authService,
+        {
+          provide: parentRepository,
+          useFactory: mockRepository,
+        },
+      ],
     }).compile();
 
-    authService = moduleRef.get<AuthService>(AuthService);
-    authController = moduleRef.get<AuthController>(AuthController);
+    authService = await moduleRef.get<AuthService>(AuthService);
+    authController = await moduleRef.get<AuthController>(AuthController);
+
+    parentRepository = await moduleRef.get<ParentRepository>(ParentRepository);
   });
 
   afterAll(async () => {});
@@ -32,11 +49,11 @@ describe('AuthService', () => {
         desired_baby_age: 5,
         request_infomation: '잘 부탁 드립니다.',
       };
-      jest
-        .spyOn(authService, 'auth signup')
-        .mockImplementation(() => signupTestData);
+      parentRepository.createUser.mockResolvedValue('Create Parent User');
 
-      expect(await authController.signup()).toBe(signupTestData);
+      await authService.signup(signupTestData);
+
+      expect(parentRepository.createUser).toHaveBeenCalled();
     });
   });
 });

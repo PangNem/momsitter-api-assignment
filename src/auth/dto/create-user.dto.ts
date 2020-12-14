@@ -5,7 +5,7 @@ import {
   IsOptional,
   Matches,
 } from 'class-validator';
-import { AllowedCreateMemberType } from 'src/user/user.enum';
+import { AllowedCreateMemberType } from '../../user/user.enum';
 
 export default class CreateUserDto {
   @IsNotEmpty()
