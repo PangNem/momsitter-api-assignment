@@ -54,19 +54,19 @@ describe('AuthService', () => {
 
   afterAll(async () => {});
 
+  const signupTestData = {
+    name: '박시터',
+    birth: 19980206,
+    gender: '여',
+    username: 'sitter1234',
+    password: 'A123456789',
+    email: 'wonderfulPark0206@gmail.com',
+    member_type: AllowedCreateMemberType.PARENT,
+    desired_baby_age: 5,
+    request_infomation: '잘 부탁 드립니다.',
+  };
   describe('auth signup', () => {
     it('create parent user', async () => {
-      const signupTestData = {
-        name: '박시터',
-        birth: 19980206,
-        gender: '여',
-        username: 'sitter1234',
-        password: 'A123456789',
-        email: 'wonderfulPark0206@gmail.com',
-        member_type: AllowedCreateMemberType.PARENT,
-        desired_baby_age: 5,
-        request_infomation: '잘 부탁 드립니다.',
-      };
       parentRepository.createUser.mockResolvedValue('Create Parent User');
 
       expect(parentRepository.createUser).not.toHaveBeenCalled();
@@ -74,6 +74,14 @@ describe('AuthService', () => {
 
       expect(parentRepository.createUser).toHaveBeenCalled();
       expect(userRepository.createUser).toHaveBeenCalled();
+    });
+  });
+  describe('auth login', () => {
+    it('login user', async () => {
+      const { username, password } = signupTestData;
+      const login = await authService.login(username, password);
+
+      expect(login).toHaveProperty('access_token');
     });
   });
 });
