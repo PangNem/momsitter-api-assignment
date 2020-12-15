@@ -79,7 +79,7 @@ describe('AuthService', () => {
   describe('auth login', () => {
     it('login user', async () => {
       const { username, password } = signupTestData;
-      const login = await authService.login(username, password);
+      const login = await authService.login({ username, password });
 
       expect(login).toHaveProperty('access_token');
     });
