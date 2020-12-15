@@ -1,9 +1,12 @@
-import { forwardRef } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { UserRepository } from '../user/user.repository';
 import { ParentRepository } from '../parent/parent.repository';
 import { AllowedCreateMemberType } from '../user/user.enum';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { SitterRepository } from '../sitter/sitter.repository';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { jwtConstants } from './auth.constants';
 
 const mockRepository = () => ({
   createUser: jest.fn(),
@@ -18,11 +21,25 @@ describe('AuthService', () => {
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
+      imports: [
+        JwtModule.register({
+          secret: jwtConstants.secret,
+          signOptions: { expiresIn: '30000s' },
+        }),
+      ],
       controllers: [AuthController],
       providers: [
-        authService,
+        AuthService,
         {
-          provide: parentRepository,
+          provide: UserRepository,
+          useFactory: mockRepository,
+        },
+        {
+          provide: ParentRepository,
+          useFactory: mockRepository,
+        },
+        {
+          provide: SitterRepository,
           useFactory: mockRepository,
         },
       ],
@@ -32,6 +49,7 @@ describe('AuthService', () => {
     authController = await moduleRef.get<AuthController>(AuthController);
 
     parentRepository = await moduleRef.get<ParentRepository>(ParentRepository);
+    userRepository = await moduleRef.get<UserRepository>(UserRepository);
   });
 
   afterAll(async () => {});
@@ -51,9 +69,11 @@ describe('AuthService', () => {
       };
       parentRepository.createUser.mockResolvedValue('Create Parent User');
 
+      expect(parentRepository.createUser).not.toHaveBeenCalled();
       await authService.signup(signupTestData);
 
       expect(parentRepository.createUser).toHaveBeenCalled();
+      expect(userRepository.createUser).toHaveBeenCalled();
     });
   });
 });

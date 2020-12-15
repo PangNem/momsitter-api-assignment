@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { SitterRepository } from 'src/sitter/sitter.repository';
-import { Sitter } from 'src/sitter/sitter.entity';
+import { SitterRepository } from '../sitter/sitter.repository';
+import { Sitter } from '../sitter/sitter.entity';
 import { MemberType } from './user.enum';
-import { Parent } from 'src/parent/parent.entity';
-import { ParentRepository } from 'src/parent/parent.repository';
+import { Parent } from '../parent/parent.entity';
+import { ParentRepository } from '../parent/parent.repository';
 
 @Injectable()
 export class UserService {
