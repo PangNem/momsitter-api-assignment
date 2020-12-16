@@ -3,11 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { SitterRepository } from 'src/sitter/sitter.repository';
-import { Sitter } from 'src/sitter/sitter.entity';
+import { SitterRepository } from '../sitter/sitter.repository';
+import { Sitter } from '../sitter/sitter.entity';
 import { MemberType } from './user.enum';
-import { Parent } from 'src/parent/parent.entity';
-import { ParentRepository } from 'src/parent/parent.repository';
+import { Parent } from '../parent/parent.entity';
+import { ParentRepository } from '../parent/parent.repository';
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,6 @@ export class UserService {
     } else {
       profile = await this.userRepository.findAll(user.id);
     }
-    console.log(profile);
     return profile;
   }
 
@@ -54,13 +53,14 @@ export class UserService {
     const sitterColumns = ['careable_baby_age', 'self_introduction'];
     const sitterData = this.filterObject(sitterColumns, updateProfileDto);
     if (this.isSitterMember(user.member_type)) {
+      console.log('parent repository will call');
       await this.sitterRepository.updateProfile(user.sitter_id, sitterData);
       return this.userRepository.findSitter(user.id);
     }
 
     const parentColumns = ['desired_baby_age', 'request_infomation'];
     const parentData = this.filterObject(parentColumns, updateProfileDto);
-    if (this.isSitterMember(user.member_type)) {
+    if (this.isParentMember(user.member_type)) {
       await this.parentRepository.updateProfile(user.parent_id, parentData);
       return this.userRepository.findParent(user.id);
     }
