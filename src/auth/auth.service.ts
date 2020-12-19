@@ -7,8 +7,8 @@ import { Sitter } from '../sitter/sitter.entity';
 import { SitterRepository } from '../sitter/sitter.repository';
 import { User } from '../user/user.entity';
 import { UserRepository } from '../user/user.repository';
-
 import CreateUserDto from './dto/create-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +23,9 @@ export class AuthService {
   async signup(createUserDto: CreateUserDto) {
     const { member_type } = createUserDto;
 
+    const SALT_ROUND = 10;
+    const password = await bcrypt.hash(createUserDto.password, SALT_ROUND);
+
     if (this.isSitterMember(member_type)) {
       const { careable_baby_age, self_introduction, ...result } = createUserDto;
 
@@ -33,6 +36,7 @@ export class AuthService {
       await this.userRepository.createUser({
         ...result,
         sitter: sitter.id,
+        password,
       });
     }
     if (this.isParentMember(member_type)) {
@@ -45,6 +49,7 @@ export class AuthService {
       await this.userRepository.createUser({
         ...result,
         parent: parent.id,
+        password,
       });
     }
   }
