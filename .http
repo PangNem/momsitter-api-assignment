@@ -37,7 +37,7 @@ Content-Type: application/json
 GET /user/profile HTTP/1.1
 Host: localhost:3000
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNpdHRlcjEyMzQiLCJzdWIiOjYsImlhdCI6MTYwNTc1Nzg3MiwiZXhwIjoxNjA2MDU3ODcyfQ.1s6D7JMJu5TSfXFs43L5xiWqbgEED_wHCPrffGgy5n8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InNpdHRlcjEyMzQiLCJzdWIiOjEsImlhdCI6MTYwODU1ODc1NCwiZXhwIjoxNjA4ODU4NzU0fQ.rHeM-bz-itkXvCPXk7S2zKTZv5CNSflTBelMxr0VLgw
 
 ###
 PATCH /user/profile HTTP/1.1
