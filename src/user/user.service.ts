@@ -41,6 +41,7 @@ export class UserService {
   }
 
   async updateProfile(user: any, updateProfileDto: UpdateProfileDto) {
+    const { member_type } = user;
     const userColumns = [
       'name',
       'birth',
@@ -52,21 +53,36 @@ export class UserService {
     const userData = this.filterObject(userColumns, updateProfileDto);
     await this.userRepository.updateProfile(user.id, userData);
 
-    const sitterColumns = ['careable_baby_age', 'self_introduction'];
-    const sitterData = this.filterObject(sitterColumns, updateProfileDto);
-    if (this.isSitterMember(user.member_type)) {
-      console.log('parent repository will call');
-      await this.sitterRepository.updateProfile(user.sitter_id, sitterData);
-      return this.userRepository.findSitter(user.id);
+    switch (member_type) {
+      case MemberType.SITTER:
+        await this.sitterUserProfileUpdate(user, updateProfileDto);
+        break;
+      case MemberType.PARENT:
+        await this.parentUserProfileUpdate(user, updateProfileDto);
+        break;
+      case MemberType.ALL:
+        await this.allUserProfileUpdate(user, updateProfileDto);
+        break;
     }
 
+    return this.getUserProfile(user);
+  }
+
+  async sitterUserProfileUpdate(user, updateProfileDto) {
+    const { sitter_id } = user;
+    const sitterColumns = ['careable_baby_age', 'self_introduction'];
+    const sitterData = this.filterObject(sitterColumns, updateProfileDto);
+
+    await this.sitterRepository.updateProfile(sitter_id, sitterData);
+  }
+  async parentUserProfileUpdate(user, updateProfileDto) {
+    const { parent_id } = user;
     const parentColumns = ['desired_baby_age', 'request_infomation'];
     const parentData = this.filterObject(parentColumns, updateProfileDto);
-    if (this.isParentMember(user.member_type)) {
-      await this.parentRepository.updateProfile(user.parent_id, parentData);
-      return this.userRepository.findParent(user.id);
-    }
+
+    await this.parentRepository.updateProfile(parent_id, parentData);
   }
+  async allUserProfileUpdate(user, updateProfileDto) {}
 
   async additionalRegister(user, data) {
     if (user.member_type === MemberType.ALL) {
@@ -104,5 +120,19 @@ export class UserService {
         obj[key] = from[key];
         return obj;
       }, {});
+  }
+}
+
+abstract class UserProfile {
+  protected profileUpdate() {}
+
+  abstract profileUpdateByMemberType();
+
+  protected getUserProfile() {}
+
+  public() {
+    this.profileUpdate();
+    this.profileUpdateByMemberType();
+    this.getUserProfile();
   }
 }
