@@ -26,16 +26,18 @@ export class UserService {
   }
 
   async getUserProfile(user) {
-    let profile;
+    const { id, member_type } = user;
 
-    if (this.isSitterMember(user.member_type)) {
-      profile = await this.userRepository.findSitter(user.id);
-    } else if (this.isParentMember(user.member_type)) {
-      profile = await this.userRepository.findParent(user.id);
-    } else {
-      profile = await this.userRepository.findAll(user.id);
+    switch (member_type) {
+      case MemberType.SITTER:
+        return this.userRepository.findSitter(id);
+      case MemberType.PARENT:
+        return this.userRepository.findParent(id);
+      case MemberType.ALL:
+        return this.userRepository.findAll(id);
+      default:
+        throw new BadRequestException('올바르지 않은 멤버입니다.');
     }
-    return profile;
   }
 
   async updateProfile(user: any, updateProfileDto: UpdateProfileDto) {
