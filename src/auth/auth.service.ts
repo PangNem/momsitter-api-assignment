@@ -9,6 +9,7 @@ import { User } from '../user/user.entity';
 import { UserRepository } from '../user/user.repository';
 import CreateUserDto from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { AllowedCreateMemberType } from '../user/user.enum';
 
 @Injectable()
 export class AuthService {
@@ -23,35 +24,49 @@ export class AuthService {
   async signup(createUserDto: CreateUserDto) {
     const { member_type } = createUserDto;
 
+    switch (member_type) {
+      case AllowedCreateMemberType.SITTER:
+        await this.sitterSignup(createUserDto);
+        break;
+      case AllowedCreateMemberType.PARENT:
+        await this.parentSignup(createUserDto);
+        break;
+    }
+  }
+
+  async sitterSignup(createUserDto: CreateUserDto) {
+    const { careable_baby_age, self_introduction, ...result } = createUserDto;
+    const password = this.getHashedPassword(createUserDto.password);
+
+    const sitter = await this.sitterRepository.createUser({
+      careable_baby_age,
+      self_introduction,
+    });
+    await this.userRepository.createUser({
+      ...result,
+      sitter: sitter.id,
+      password,
+    });
+  }
+
+  async parentSignup(createUserDto: CreateUserDto) {
+    const { desired_baby_age, request_infomation, ...result } = createUserDto;
+    const password = this.getHashedPassword(createUserDto.password);
+
+    const parent = await this.parentRepository.createUser({
+      desired_baby_age,
+      request_infomation,
+    });
+    await this.userRepository.createUser({
+      ...result,
+      parent: parent.id,
+      password,
+    });
+  }
+
+  getHashedPassword(password) {
     const SALT_ROUND = 10;
-    const password = await bcrypt.hash(createUserDto.password, SALT_ROUND);
-
-    if (this.isSitterMember(member_type)) {
-      const { careable_baby_age, self_introduction, ...result } = createUserDto;
-
-      const sitter = await this.sitterRepository.createUser({
-        careable_baby_age,
-        self_introduction,
-      });
-      await this.userRepository.createUser({
-        ...result,
-        sitter: sitter.id,
-        password,
-      });
-    }
-    if (this.isParentMember(member_type)) {
-      const { desired_baby_age, request_infomation, ...result } = createUserDto;
-
-      const parent = await this.parentRepository.createUser({
-        desired_baby_age,
-        request_infomation,
-      });
-      await this.userRepository.createUser({
-        ...result,
-        parent: parent.id,
-        password,
-      });
-    }
+    return bcrypt.hash(password, SALT_ROUND);
   }
 
   async validateUser(username: string, password: string): Promise<any> {
@@ -70,12 +85,5 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
-  }
-
-  private isSitterMember(member_type: string): boolean {
-    return member_type === 'SITTER';
-  }
-  private isParentMember(member_type: string): boolean {
-    return member_type === 'PARENT';
   }
 }
