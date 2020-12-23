@@ -42,6 +42,27 @@ export class UserService {
 
   async updateProfile(user: any, updateProfileDto: UpdateProfileDto) {
     const { member_type } = user;
+
+    await this.updateUserProfile(user, updateProfileDto);
+
+    switch (member_type) {
+      case MemberType.SITTER:
+        await this.updateSitterUserProfile(user, updateProfileDto);
+        break;
+      case MemberType.PARENT:
+        await this.updateParentUserProfile(user, updateProfileDto);
+        break;
+      case MemberType.ALL:
+        await this.updateAllUserProfile(user, updateProfileDto);
+        break;
+      default:
+        throw new BadRequestException('올바르지 않은 멤버입니다.');
+    }
+
+    return this.getUserProfile(user);
+  }
+  async updateUserProfile(user, updateProfileDto) {
+    const { id } = user;
     const userColumns = [
       'name',
       'birth',
@@ -51,66 +72,46 @@ export class UserService {
       'email',
     ];
     const userData = this.filterObject(userColumns, updateProfileDto);
-    await this.userRepository.updateProfile(user.id, userData);
-
-    switch (member_type) {
-      case MemberType.SITTER:
-        await this.sitterUserProfileUpdate(user, updateProfileDto);
-        break;
-      case MemberType.PARENT:
-        await this.parentUserProfileUpdate(user, updateProfileDto);
-        break;
-      case MemberType.ALL:
-        await this.allUserProfileUpdate(user, updateProfileDto);
-        break;
-    }
-
-    return this.getUserProfile(user);
+    await this.userRepository.updateProfile(id, userData);
   }
 
-  async sitterUserProfileUpdate(user, updateProfileDto) {
+  async updateSitterUserProfile(user, updateProfileDto) {
     const { sitter_id } = user;
     const sitterColumns = ['careable_baby_age', 'self_introduction'];
     const sitterData = this.filterObject(sitterColumns, updateProfileDto);
 
     await this.sitterRepository.updateProfile(sitter_id, sitterData);
   }
-  async parentUserProfileUpdate(user, updateProfileDto) {
+  async updateParentUserProfile(user, updateProfileDto) {
     const { parent_id } = user;
     const parentColumns = ['desired_baby_age', 'request_infomation'];
     const parentData = this.filterObject(parentColumns, updateProfileDto);
 
     await this.parentRepository.updateProfile(parent_id, parentData);
   }
-  async allUserProfileUpdate(user, updateProfileDto) {}
+  async updateAllUserProfile(user, updateProfileDto) {}
 
   async additionalRegister(user, data) {
-    if (user.member_type === MemberType.ALL) {
-      throw new BadRequestException();
-    }
+    const { id, member_type } = user;
 
-    if (this.isSitterMember(user.member_type)) {
-      const parent = await this.parentRepository.createUser(data);
-      await this.userRepository.updateProfile(user.id, {
-        parent: parent.id,
-        member_type: MemberType.ALL,
-      });
+    switch (member_type) {
+      case MemberType.ALL:
+        throw new BadRequestException();
+      case MemberType.SITTER:
+        const parent = await this.parentRepository.createUser(data);
+        await this.userRepository.updateProfile(id, {
+          parent: parent.id,
+          member_type: MemberType.ALL,
+        });
+        break;
+      case MemberType.PARENT:
+        const sitter = await this.sitterRepository.createUser(data);
+        await this.userRepository.updateProfile(id, {
+          sitter: sitter.id,
+          member_type: MemberType.ALL,
+        });
+        break;
     }
-    if (this.isParentMember(user.member_type)) {
-      const sitter = await this.sitterRepository.createUser(data);
-      await this.userRepository.updateProfile(user.id, {
-        sitter: sitter.id,
-        member_type: MemberType.ALL,
-      });
-    }
-  }
-
-  private isSitterMember(member_type) {
-    return member_type === MemberType.SITTER;
-  }
-
-  private isParentMember(member_type) {
-    return member_type === MemberType.PARENT;
   }
 
   private filterObject(keys, from) {
@@ -120,19 +121,5 @@ export class UserService {
         obj[key] = from[key];
         return obj;
       }, {});
-  }
-}
-
-abstract class UserProfile {
-  protected profileUpdate() {}
-
-  abstract profileUpdateByMemberType();
-
-  protected getUserProfile() {}
-
-  public() {
-    this.profileUpdate();
-    this.profileUpdateByMemberType();
-    this.getUserProfile();
   }
 }
