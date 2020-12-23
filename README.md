@@ -21,4 +21,5 @@
       ├── app.module.ts
       └── main.ts
     ├── test # e2e 테스트 코드 파일, 현재는 비어있음
+    ├── .http # vscode http client 테스트 파일
     └── README.md
