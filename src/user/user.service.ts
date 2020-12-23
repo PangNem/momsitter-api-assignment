@@ -26,19 +26,43 @@ export class UserService {
   }
 
   async getUserProfile(user) {
-    let profile;
+    const { id, member_type } = user;
 
-    if (this.isSitterMember(user.member_type)) {
-      profile = await this.userRepository.findSitter(user.id);
-    } else if (this.isParentMember(user.member_type)) {
-      profile = await this.userRepository.findParent(user.id);
-    } else {
-      profile = await this.userRepository.findAll(user.id);
+    switch (member_type) {
+      case MemberType.SITTER:
+        return this.userRepository.findSitter(id);
+      case MemberType.PARENT:
+        return this.userRepository.findParent(id);
+      case MemberType.ALL:
+        return this.userRepository.findAll(id);
+      default:
+        throw new BadRequestException('올바르지 않은 멤버입니다.');
     }
-    return profile;
   }
 
   async updateProfile(user: any, updateProfileDto: UpdateProfileDto) {
+    const { member_type } = user;
+
+    await this.updateUserProfile(user, updateProfileDto);
+
+    switch (member_type) {
+      case MemberType.SITTER:
+        await this.updateSitterUserProfile(user, updateProfileDto);
+        break;
+      case MemberType.PARENT:
+        await this.updateParentUserProfile(user, updateProfileDto);
+        break;
+      case MemberType.ALL:
+        await this.updateAllUserProfile(user, updateProfileDto);
+        break;
+      default:
+        throw new BadRequestException('올바르지 않은 멤버입니다.');
+    }
+
+    return this.getUserProfile(user);
+  }
+  async updateUserProfile(user, updateProfileDto) {
+    const { id } = user;
     const userColumns = [
       'name',
       'birth',
@@ -48,51 +72,46 @@ export class UserService {
       'email',
     ];
     const userData = this.filterObject(userColumns, updateProfileDto);
-    await this.userRepository.updateProfile(user.id, userData);
+    await this.userRepository.updateProfile(id, userData);
+  }
 
+  async updateSitterUserProfile(user, updateProfileDto) {
+    const { sitter_id } = user;
     const sitterColumns = ['careable_baby_age', 'self_introduction'];
     const sitterData = this.filterObject(sitterColumns, updateProfileDto);
-    if (this.isSitterMember(user.member_type)) {
-      console.log('parent repository will call');
-      await this.sitterRepository.updateProfile(user.sitter_id, sitterData);
-      return this.userRepository.findSitter(user.id);
-    }
 
+    await this.sitterRepository.updateProfile(sitter_id, sitterData);
+  }
+  async updateParentUserProfile(user, updateProfileDto) {
+    const { parent_id } = user;
     const parentColumns = ['desired_baby_age', 'request_infomation'];
     const parentData = this.filterObject(parentColumns, updateProfileDto);
-    if (this.isParentMember(user.member_type)) {
-      await this.parentRepository.updateProfile(user.parent_id, parentData);
-      return this.userRepository.findParent(user.id);
-    }
+
+    await this.parentRepository.updateProfile(parent_id, parentData);
   }
+  async updateAllUserProfile(user, updateProfileDto) {}
 
   async additionalRegister(user, data) {
-    if (user.member_type === MemberType.ALL) {
-      throw new BadRequestException();
-    }
+    const { id, member_type } = user;
 
-    if (this.isSitterMember(user.member_type)) {
-      const parent = await this.parentRepository.createUser(data);
-      await this.userRepository.updateProfile(user.id, {
-        parent: parent.id,
-        member_type: MemberType.ALL,
-      });
+    switch (member_type) {
+      case MemberType.ALL:
+        throw new BadRequestException();
+      case MemberType.SITTER:
+        const parent = await this.parentRepository.createUser(data);
+        await this.userRepository.updateProfile(id, {
+          parent: parent.id,
+          member_type: MemberType.ALL,
+        });
+        break;
+      case MemberType.PARENT:
+        const sitter = await this.sitterRepository.createUser(data);
+        await this.userRepository.updateProfile(id, {
+          sitter: sitter.id,
+          member_type: MemberType.ALL,
+        });
+        break;
     }
-    if (this.isParentMember(user.member_type)) {
-      const sitter = await this.sitterRepository.createUser(data);
-      await this.userRepository.updateProfile(user.id, {
-        sitter: sitter.id,
-        member_type: MemberType.ALL,
-      });
-    }
-  }
-
-  private isSitterMember(member_type) {
-    return member_type === MemberType.SITTER;
-  }
-
-  private isParentMember(member_type) {
-    return member_type === MemberType.PARENT;
   }
 
   private filterObject(keys, from) {
